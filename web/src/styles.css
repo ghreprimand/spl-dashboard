@@ -685,3 +685,52 @@ footer {
   text-overflow: ellipsis;
   color: var(--accent);
 }
+
+/* First-run banner and disclaimer */
+.first-run {
+  border-left: 3px solid var(--accent);
+}
+.first-run-body {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  align-items: flex-start;
+}
+.first-run-urls {
+  flex: 1 1 260px;
+  min-width: 0;
+}
+.first-run-urls ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.first-run-urls a {
+  font-size: 1.05rem;
+  word-break: break-all;
+}
+.first-run-qr {
+  flex: 0 0 auto;
+  width: 148px;
+  height: 148px;
+  background: #fff;
+  padding: 6px;
+  border-radius: 6px;
+}
+.first-run-qr svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+.first-run-dismiss {
+  flex: 0 0 auto;
+}
+.disclaimer {
+  font-size: 0.8rem;
+  line-height: 1.4;
+  opacity: 0.8;
+  margin-top: 8px;
+}

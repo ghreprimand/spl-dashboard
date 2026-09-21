@@ -121,3 +121,11 @@ export interface SavedMapping {
   offsetDb: number;
   mappedAt: string | null;
 }
+
+export interface Addresses {
+  port: number;
+  localAdmin: string;
+  localDisplay: string;
+  lan: { host: string; admin: string; display: string }[];
+  note: string;
+}

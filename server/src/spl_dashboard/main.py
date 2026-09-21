@@ -13,15 +13,23 @@ from fastapi import FastAPI, HTTPException, Request, WebSocket, WebSocketDisconn
 from fastapi.responses import FileResponse, JSONResponse, StreamingResponse
 from fastapi.staticfiles import StaticFiles
 
+from .addresses import address_report
 from .capture import devices
 from .models import AnnotationRequest, EventRequest, ReadingLocationRequest, Settings
 from .runtime import Runtime
 
 
+def _default_data_dir() -> Path:
+    override = os.environ.get("SPL_DATA_DIR")
+    if override:
+        return Path(override)
+    from platformdirs import user_data_dir
+
+    return Path(user_data_dir("spl-dashboard", appauthor=False))
+
+
 def create_app(directory: Path | None = None) -> FastAPI:
-    data_dir = directory or Path(
-        os.environ.get("SPL_DATA_DIR", str(Path.home() / ".local/share/spl-dashboard"))
-    )
+    data_dir = directory or _default_data_dir()
 
     @asynccontextmanager
     async def lifespan(app: FastAPI) -> AsyncIterator[None]:
@@ -69,8 +77,15 @@ def create_app(directory: Path | None = None) -> FastAPI:
     def runtime() -> Runtime:
         return app.state.runtime
 
+    def request_port(request: Request) -> int:
+        host_header = request.headers.get("host", "")
+        _, _, port_text = host_header.partition(":")
+        if port_text.isdigit():
+            return int(port_text)
+        return request.url.port or (443 if request.url.scheme == "https" else 80)
+
     @app.get("/api/health")
-    async def health():
+    async def health(request: Request):
         frame = runtime().frame
         return {
             "status": "degraded" if frame.status.stale or frame.status.loggingError else "ok",
@@ -78,7 +93,12 @@ def create_app(directory: Path | None = None) -> FastAPI:
             "schemaVersion": 2,
             "hardwareValidated": False,
             "input": frame.status.model_dump(),
+            "addresses": address_report(request_port(request)),
         }
+
+    @app.get("/api/addresses")
+    async def addresses(request: Request):
+        return address_report(request_port(request))
 
     @app.get("/api/config")
     async def config():

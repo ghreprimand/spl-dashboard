@@ -1,5 +1,7 @@
 import { AudienceMapping } from "./AudienceMapping";
+import { FirstRunBanner } from "./FirstRunBanner";
 import { SpectrumAnalyzer } from "./SpectrumAnalyzer";
+import { DISCLAIMER } from "./disclaimer";
 import {
   useEffect,
   useRef,
@@ -723,6 +725,7 @@ export function App() {
           {notice}
         </div>
       )}
+      <FirstRunBanner calibrated={frame?.status.calibrated ?? false} />
       <LayoutControls layout={layout} setLayout={setLayout} />
       <section className="card">
         <label>
@@ -1126,8 +1129,11 @@ export function App() {
         />
       )}
       <footer>
-        Runs on your event LAN · audio stays on the appliance · operational
-        monitoring, no certification claim
+        <p>
+          Runs on your event LAN · audio stays on this computer · browsers only
+          receive numbers
+        </p>
+        <p className="disclaimer">{DISCLAIMER}</p>
       </footer>
     </>
   );
