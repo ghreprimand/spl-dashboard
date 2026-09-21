@@ -15,6 +15,11 @@ Use a Linux host with a reliable USB port, local storage and a LAN connection.
 Install Python 3.11+, `libportaudio2`, `alsa-utils`, `avahi-daemon` (optional, for
 `.local` names) and — for automatic UMIK-1 calibration — leave ALSA available.
 
+A Raspberry Pi 4 or 5 on 64-bit Raspberry Pi OS (Bookworm ships Python 3.11)
+should be adequate; `numpy`/`scipy` install as prebuilt aarch64 wheels. The
+project has not run on a Pi yet — if you do, please report CPU load and whether
+capture stays gap-free over a few hours.
+
 ## Install (online)
 
 The simplest install fetches the release from PyPI into a virtual environment:

@@ -33,7 +33,27 @@ web browser — those devices only ever receive numbers, never audio.
 | --- | --- |
 | **Laptop only** — you mix and monitor on the same machine | Install and run `spl-dashboard`; open `http://localhost:8000/display` on the same laptop. |
 | **Laptop + iPad** — you want a big readout at front of house | Run `spl-dashboard` on the laptop; open the LAN `/display` URL it prints on the iPad's browser. |
-| **Dedicated box** — a small always-on Linux computer at the mic | Install it as a service on that box; see [operator deployment](docs/deployment.md). |
+| **Dedicated box (recommended)** — a small always-on Linux computer or Raspberry Pi at the mic | Install it as a service on that box; see [operator deployment](docs/deployment.md). |
+
+## Platform support — read this first
+
+| Platform | Runs? | UMIK-1 calibration | Other mics |
+| --- | --- | --- | --- |
+| **Linux** (x86 or Raspberry Pi) | Yes, **recommended** | Automatic: load the miniDSP cal file and you're done | Calibrator or typed-in sensitivity |
+| macOS | Yes | Frequency response from the file, but the **level must be set by you** (calibrator or typed-in sensitivity) | Same |
+| Windows | Yes | Same as macOS | Same |
+
+Why the difference: the level number in a UMIK-1 cal file is only valid once
+the operating system's own input-gain stage is known. On Linux the app can
+verify there isn't one. On macOS and Windows it doesn't yet read the OS input
+slider, so it refuses to guess. Reading that slider is planned; until then,
+Mac/Windows users need a calibrator or a known sensitivity (see the
+[calibration guide](docs/calibration-guide.md)).
+
+**Recommended setup:** a small always-on Linux box with the mic plugged in
+(an old laptop, a mini PC, or a Raspberry Pi 4/5 on 64-bit Raspberry Pi OS)
+sitting at the mic position, and the iPad as the display. It should run fine
+on a Pi 4 or 5 — that has not been tested by the project yet; reports welcome.
 
 ## Install and run
 

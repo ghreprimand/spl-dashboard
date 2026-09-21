@@ -6,6 +6,19 @@ iPad beside Mixing Station. It should take about fifteen minutes the first time.
 You only install software on **one** computer: the one with the microphone. The
 iPad and any other devices just open a web page.
 
+## 0. Pick the computer
+
+Any Linux, macOS or Windows machine with a USB port works, but **Linux is
+recommended**: it is the only platform where a UMIK-1 is calibrated
+automatically from its file. On macOS and Windows you will need a calibrator or
+a known sensitivity figure for the level (see the
+[calibration guide](calibration-guide.md)); reading the OS input gain so the
+file can be trusted there is planned but not done.
+
+A Raspberry Pi 4 or 5 running 64-bit Raspberry Pi OS (Bookworm or later, which
+ships Python 3.11) should work as the dedicated box; the project has not tested
+it yet. The `uv` commands below are the same on a Pi.
+
 ## 1. Install uv
 
 [uv](https://docs.astral.sh/uv/) is a small tool that fetches and runs Python
