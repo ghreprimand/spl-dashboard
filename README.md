@@ -69,6 +69,14 @@ When it starts, it prints the address to open on this computer and the addresses
 to open on other devices on your network. New here? Follow the
 **[getting-started walk-through](docs/getting-started.md)**.
 
+### On an iPad, next to Mixing Station
+
+Open the strip address in Safari and use **Share → Add to Home Screen**; the
+icon opens the strip as a menuless full-screen app. Launch it, open Mixing
+Station on top, and resize Mixing Station so it leaves enough room at the top of
+the screen to see the strip above it. Details, plus Android notes, in the
+[tablet setup guide](docs/tablet-setup.md).
+
 ### Upgrade
 
 ```bash
