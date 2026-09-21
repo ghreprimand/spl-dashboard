@@ -25,7 +25,7 @@ const metrics: { key: keyof Levels; label: string; detail: string }[] = [
   { key: "lasDb", label: "Live level", detail: "LAS · A · slow" },
   {
     key: "lasMaxDb",
-    label: "Maximum live level",
+    label: "Max live level",
     detail: "A · slow · since reset",
   },
   {

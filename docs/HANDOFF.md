@@ -36,7 +36,7 @@ including in a shallow viewport. iPadOS owns external window placement.
 
 ## Strip metrics
 
-Left to right the strip shows Live level (`LAS`), Maximum live level (`lasMaxDb`),
+Left to right the strip shows Live level (`LAS`), Max live level (`lasMaxDb`),
 1-minute average (`LAeq1`), 10-minute average (`LAeq10`) and Peak since reset
 (`LCpeak`), with the technical names retained beneath the friendly labels.
 `lasMaxDb` is the highest A-weighted Slow value evaluated on the service's 100 ms
