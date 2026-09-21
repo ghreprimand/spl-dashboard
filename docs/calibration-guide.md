@@ -85,10 +85,17 @@ app. Keep the two microphones close and the field steady.
 ### You know the sensitivity but have no calibrator
 
 Use **Manual sensitivity**. Enter the raw RMS the microphone produces at
-94 dB SPL, in this app's dBFS scale. For a miniDSP microphone this is the
-**Sens Factor** from its calibration file (a value like `-30.2 dB`). Add a note
+94 dB SPL, in this app's dBFS scale (a value like `-30.2 dBFS`). Add a note
 recording the audio interface and the OS input gain, then apply. The strip shows
 `MANUAL CAL`.
+
+**This is not the miniDSP "Sens Factor".** The Sens Factor in a UMIK
+calibration file is a small number near 0 dB and is defined against a different
+convention (see [UMIK sensitivity conventions](umik-sensitivity.md)). For a
+UMIK-1 plugged in directly at its normal 18 dB gain with no OS digital gain,
+the value to enter is **Sens Factor − 30 dB** (a Sens Factor of `-0.25` gives
+`-30.25`). If the OS applies any input gain, that relationship no longer holds
+and you should use a calibrator or a side-by-side meter instead.
 
 *Caveat:* this depends entirely on the sensitivity figure being correct for your
 exact input gain. On macOS and Windows the OS input-volume slider changes the

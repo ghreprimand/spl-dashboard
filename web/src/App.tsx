@@ -463,9 +463,10 @@ function Setup({
           <div className="manual-cal">
             <p className="muted">
               Enter the raw RMS the microphone produces at 94 dB SPL, in this
-              app’s dBFS scale (equivalent to a miniDSP “Sens Factor”). Get it
-              from the microphone’s data or by measuring a calibrator with the
-              value shown under Input health.
+              app’s dBFS scale. This is <strong>not</strong> the miniDSP “Sens
+              Factor”: for a UMIK-1 on direct input at its normal gain it is
+              Sens Factor − 30 dB (see the calibration guide). If unsure,
+              measure a calibrator with the value shown under Input health.
             </p>
             <div className="form-grid">
               {field("manualDbfsAt94", "Sensitivity · dBFS at 94 dB SPL")}
