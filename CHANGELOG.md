@@ -3,6 +3,28 @@
 All notable changes to SPL Dashboard are recorded here. This project adheres to
 [Semantic Versioning](https://semver.org/).
 
+## 0.5.1
+
+### Fixed
+
+- **Windows:** the single-instance lock imported `fcntl`, which does not exist on
+  Windows, so `uvx spl-dashboard` failed to start there. The lock now uses
+  `msvcrt` on Windows and `fcntl` elsewhere.
+- **Strip:** "Maximum live level" is now "Max live level" so the label and its
+  reset button no longer wrap at typical strip widths.
+
+### Documentation
+
+- New [tablet setup guide](docs/tablet-setup.md): making the strip a menuless
+  home-screen app, the window-overlap workflow next to a mixer app on iPad, and
+  best-effort notes for Android (HTTPS requirement for standalone shortcuts,
+  split screen and pop-up windows).
+- Corrected the manual-sensitivity guidance: the value is the raw dBFS at
+  94 dB SPL in this app's scale, **not** the miniDSP Sens Factor (for a UMIK-1
+  on direct input it is Sens Factor − 30 dB).
+- Release workflow now creates a GitHub Release with the changelog entry and the
+  built wheel/sdist attached; the TestPyPI rehearsal job was removed.
+
 ## 0.5.0
 
 First public PyPI release. The distribution is renamed and packaged so a

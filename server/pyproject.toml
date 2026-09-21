@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "spl-dashboard"
-version = "0.5.0"
+version = "0.5.1"
 description = "Offline, LAN-served sound-pressure-level monitor for live events; run it on the microphone computer and view the dashboard from any browser or iPad."
 readme = "README.md"
 license = "GPL-3.0-only"

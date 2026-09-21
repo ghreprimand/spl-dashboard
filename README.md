@@ -87,7 +87,7 @@ uvx spl-dashboard@latest        # run the newest release
 ## Documentation
 
 - **[Documentation index](docs/README.md)** — everything, organised by audience.
-- [Getting started](docs/getting-started.md) · [Calibration guide](docs/calibration-guide.md) · [Troubleshooting](docs/troubleshooting.md)
+- [Getting started](docs/getting-started.md) · [Calibration guide](docs/calibration-guide.md) · [Tablet setup](docs/tablet-setup.md) · [Troubleshooting](docs/troubleshooting.md)
 
 ## Important: what this is, and is not
 

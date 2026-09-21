@@ -9,6 +9,7 @@ You run the app on the microphone computer and read it on an iPad or browser.
 
 - [Getting started](getting-started.md) — install to first reading, step by step.
 - [Calibration guide](calibration-guide.md) — which mode for which microphone.
+- [Tablet setup](tablet-setup.md) — home-screen app and window overlap on iPad or Android.
 - [Microphone placement and venue correction](microphone-placement.md) — where to
   put the mic and how audience estimates work.
 - [Troubleshooting](troubleshooting.md) — common problems and fixes.

@@ -65,7 +65,7 @@ def create_app(directory: Path | None = None) -> FastAPI:
             finally:
                 await runtime.close()
 
-    app = FastAPI(title="SPL Dashboard", version="0.5.0", lifespan=lifespan)
+    app = FastAPI(title="SPL Dashboard", version="0.5.1", lifespan=lifespan)
 
     @app.middleware("http")
     async def local_mutations(request: Request, call_next):

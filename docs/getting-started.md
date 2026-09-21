@@ -88,9 +88,8 @@ the banner). This is the **strip** — the primary readout.
 - Tap the **•••** button on the strip to open display settings.
 - Adjust width, height, digit size, spacing and position so it reads well at the
   size you'll actually use. These settings are saved in that browser.
-- Use iPadOS's own window controls (Split View / Slide Over) to place the browser
-  window beside Mixing Station. The strip stays put; each browser keeps its own
-  size and position.
+- To make it a menuless home-screen app and keep it visible next to your mixer
+  app, see [Putting the strip on an iPad or Android tablet](tablet-setup.md).
 
 ## 7. Log an event (optional)
 

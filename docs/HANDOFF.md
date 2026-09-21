@@ -1,11 +1,11 @@
 # Build handoff
 
-This document describes the **current** state of SPL Dashboard at version 0.5.0.
+This document describes the **current** state of SPL Dashboard at version 0.5.1.
 It is self-contained: read it top to bottom for the present behaviour. The
 **Version history** at the end is retained for context only and is explicitly
 superseded where it disagrees with the sections above.
 
-## Current state (0.5.0)
+## Current state (0.5.1)
 
 Distributed on PyPI as `spl-dashboard` and runnable cross-platform with
 `uvx spl-dashboard`. The web UI is bundled inside the wheel; a `spl-dashboard`

@@ -28,7 +28,7 @@ sudo /opt/spl-dashboard/.venv/bin/pip install spl-dashboard
 That installs the `spl-dashboard` command at
 `/opt/spl-dashboard/.venv/bin/spl-dashboard`, with the UI already inside it.
 
-To pin a specific version, install `spl-dashboard==0.5.0`.
+To pin a specific version, install `spl-dashboard==0.5.1`.
 
 ### Alternative: a local wheel
 
@@ -36,7 +36,7 @@ If you built the wheel yourself (`make wheel` produces
 `dist/spl_dashboard-<version>-py3-none-any.whl`), install that file instead:
 
 ```bash
-sudo /opt/spl-dashboard/.venv/bin/pip install dist/spl_dashboard-0.5.0-py3-none-any.whl
+sudo /opt/spl-dashboard/.venv/bin/pip install dist/spl_dashboard-0.5.1-py3-none-any.whl
 ```
 
 ## Run as a service
@@ -86,7 +86,7 @@ make wheel                    # -> dist/spl_dashboard-<version>-py3-none-any.whl
 
 # Download all runtime dependencies for the target's OS/Python/CPU.
 python3 -m pip download --only-binary=:all: --dest wheelhouse \
-  dist/spl_dashboard-0.5.0-py3-none-any.whl
+  dist/spl_dashboard-0.5.1-py3-none-any.whl
 ```
 
 Build the wheelhouse on the **same OS/Python/CPU architecture** as the appliance
@@ -97,7 +97,7 @@ so the binary wheels (numpy, scipy, sounddevice) match. Transfer `dist/`,
 sudo python3 -m venv /opt/spl-dashboard/.venv
 sudo /opt/spl-dashboard/.venv/bin/pip install \
   --no-index --find-links wheelhouse \
-  dist/spl_dashboard-0.5.0-py3-none-any.whl
+  dist/spl_dashboard-0.5.1-py3-none-any.whl
 ```
 
 `--no-index --find-links wheelhouse` keeps the install offline. Because the UI is
