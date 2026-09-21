@@ -3,12 +3,37 @@ requires = ["hatchling>=1.26"]
 build-backend = "hatchling.build"
 
 [project]
-name = "spl-dashboard-server"
-version = "0.4.4"
-description = "LAN telemetry service for SPL Dashboard"
+name = "spl-dashboard"
+version = "0.5.0"
+description = "Offline, LAN-served sound-pressure-level monitor for live events; run it on the microphone computer and view the dashboard from any browser or iPad."
+readme = "README.md"
 license = "GPL-3.0-only"
 license-files = ["LICENSE"]
 requires-python = ">=3.11"
+authors = [{ name = "ghreprimand" }]
+keywords = [
+  "spl",
+  "sound-pressure-level",
+  "sound-level-meter",
+  "audio",
+  "measurement",
+  "live-sound",
+  "dashboard",
+  "umik-1",
+]
+classifiers = [
+  "Development Status :: 4 - Beta",
+  "Environment :: Web Environment",
+  "Framework :: FastAPI",
+  "Intended Audience :: End Users/Desktop",
+  "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
+  "Operating System :: OS Independent",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Topic :: Multimedia :: Sound/Audio :: Analysis",
+]
 dependencies = [
   "fastapi>=0.115,<1",
   "pydantic>=2.10,<3",
@@ -16,6 +41,7 @@ dependencies = [
   "numpy>=2,<3",
   "scipy>=1.15,<2",
   "sounddevice>=0.5,<1",
+  "platformdirs>=4,<5",
 ]
 
 [project.optional-dependencies]
@@ -26,12 +52,30 @@ dev = [
   "mypy>=1.15,<2",
 ]
 
+[project.scripts]
+spl-dashboard = "spl_dashboard.cli:main"
+
+[project.urls]
+Homepage = "https://github.com/ghreprimand/spl-dashboard"
+Source = "https://github.com/ghreprimand/spl-dashboard"
+Issues = "https://github.com/ghreprimand/spl-dashboard/issues"
+Changelog = "https://github.com/ghreprimand/spl-dashboard/blob/main/CHANGELOG.md"
+
 [tool.pytest.ini_options]
 pythonpath = ["src"]
 testpaths = ["tests"]
 
+# The built web UI is copied into src/spl_dashboard/static by `make ui-bundle`
+# before packaging. It is gitignored, so it must be declared as a build artifact
+# to survive hatchling's VCS-aware file selection in both the wheel and sdist.
+[tool.hatch.build]
+artifacts = ["src/spl_dashboard/static/**"]
+
 [tool.hatch.build.targets.wheel]
 packages = ["src/spl_dashboard"]
+
+[tool.hatch.build.targets.sdist]
+include = ["src", "README.md", "LICENSE"]
 
 [tool.ruff]
 line-length = 100

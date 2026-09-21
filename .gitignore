@@ -8,6 +8,10 @@ __pycache__/
 *.egg-info/
 node_modules/
 web/dist/
+# Built UI copied into the wheel by `make ui-bundle`; regenerated, never committed.
+server/src/spl_dashboard/static/
+# Packaging output.
+/dist/
 *.tsbuildinfo
 coverage/
 *.sqlite3

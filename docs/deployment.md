@@ -23,7 +23,7 @@ python3 -m pip wheel --no-deps --wheel-dir dist ./server
 # Use a Python/OS/architecture matching the target appliance.
 # Select the exact release wheel if dist contains more than one version.
 python3 -m pip download --only-binary=:all: --dest wheelhouse \
-  dist/spl_dashboard_server-0.4.4-py3-none-any.whl
+  dist/spl_dashboard-0.5.0-py3-none-any.whl
 
 # Static UI -> web/dist
 cd web && npm ci && npm run build && cd ..
@@ -43,7 +43,7 @@ sudo mkdir -p /opt/spl-dashboard/server /opt/spl-dashboard/web
 sudo python3 -m venv /opt/spl-dashboard/server/.venv
 sudo /opt/spl-dashboard/server/.venv/bin/pip install \
   --no-index --find-links wheelhouse \
-  dist/spl_dashboard_server-0.4.4-py3-none-any.whl
+  dist/spl_dashboard-0.5.0-py3-none-any.whl
 sudo mkdir -p /opt/spl-dashboard/web/dist
 sudo cp -a web/dist/. /opt/spl-dashboard/web/dist/
 ```
@@ -71,7 +71,7 @@ No write permission to the application tree is needed. The service binds port
 `http://splbox.local:8000/`; Avahi advertises the existing hostname, not an
 invented alias.
 
-Confirm the installed version after starting: `pip show spl-dashboard-server`
+Confirm the installed version after starting: `pip show spl-dashboard`
 in the appliance venv, or `curl -s http://localhost:8000/openapi.json` and read
 `.info.version`. `GET /api/health` returns `schemaVersion` (currently 2),
 `mode` and input flags for a quick liveness check.
@@ -166,14 +166,14 @@ previous `web/dist` so you can roll the application back without touching data.
    sudo systemctl stop spl-dashboard
    sudo /opt/spl-dashboard/server/.venv/bin/pip install \
      --no-index --find-links wheelhouse --upgrade \
-     dist/spl_dashboard_server-0.4.4-py3-none-any.whl
+     dist/spl_dashboard-0.5.0-py3-none-any.whl
    sudo rsync -a --delete web/dist/ /opt/spl-dashboard/web/dist/
    sudo systemctl start spl-dashboard
    ```
 
    For a UI-only change you can replace `web/dist` and restart without a new
    wheel; for any backend change the wheel install is mandatory.
-4. **Verify.** Confirm the new version (`pip show spl-dashboard-server` or
+4. **Verify.** Confirm the new version (`pip show spl-dashboard` or
    `/openapi.json` `.info.version`), check `GET /api/health` reports `schemaVersion`
    2 and the expected `mode`, and inspect `journalctl -u spl-dashboard -n 100 --no-pager` for a clean
    start with no LOG FAILURE. Open the strip and confirm live telemetry.

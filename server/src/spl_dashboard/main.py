@@ -41,7 +41,7 @@ def create_app(directory: Path | None = None) -> FastAPI:
             finally:
                 await runtime.close()
 
-    app = FastAPI(title="SPL Dashboard", version="0.4.4", lifespan=lifespan)
+    app = FastAPI(title="SPL Dashboard", version="0.5.0", lifespan=lifespan)
 
     @app.middleware("http")
     async def local_mutations(request: Request, call_next):
@@ -304,10 +304,8 @@ def create_app(directory: Path | None = None) -> FastAPI:
             headers={"Content-Disposition": f'attachment; filename="event-{event_id}.csv"'},
         )
 
-    dist = Path(
-        os.environ.get("SPL_WEB_DIST", str(Path(__file__).resolve().parents[3] / "web/dist"))
-    )
-    if dist.is_dir():
+    dist = locate_web_dist()
+    if dist is not None:
         app.mount("/assets", StaticFiles(directory=dist / "assets"), name="assets")
 
         @app.get("/")
@@ -322,8 +320,39 @@ def create_app(directory: Path | None = None) -> FastAPI:
         @app.get("/icon.svg")
         async def icon():
             return FileResponse(dist / "icon.svg")
+    else:
+        message = (
+            "The web UI was not found. This installation is missing its bundled "
+            "interface. Reinstall SPL Dashboard from a published wheel, or, when "
+            "developing from a source checkout, build it with `npm --prefix web ci && "
+            "npm --prefix web run build` and either run `make ui-bundle` or set "
+            "SPL_WEB_DIST to the built web/dist directory."
+        )
+
+        @app.get("/")
+        @app.get("/display")
+        async def missing_ui():
+            return JSONResponse({"detail": message}, status_code=500)
 
     return app
+
+
+def locate_web_dist() -> Path | None:
+    """Resolve the built web UI.
+
+    Order: the UI bundled inside the installed package, then the SPL_WEB_DIST
+    developer override, then a source-checkout ``web/dist``. Returns ``None`` when
+    no built UI is available so the caller can serve a clear error instead.
+    """
+    candidates = [Path(__file__).resolve().parent / "static"]
+    override = os.environ.get("SPL_WEB_DIST")
+    if override:
+        candidates.append(Path(override))
+    candidates.append(Path(__file__).resolve().parents[3] / "web/dist")
+    for candidate in candidates:
+        if (candidate / "index.html").is_file() and (candidate / "assets").is_dir():
+            return candidate
+    return None
 
 
 app = create_app()
