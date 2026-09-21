@@ -1,9 +1,9 @@
-# Developer reference — 0.4.4
+# Developer reference — 0.5.0
 
 Read [AGENTS.md](../AGENTS.md), [README](../README.md) and all current documents
 before changing architecture, DSP, calibration or terminology. Current source is
 executable truth; older ADRs record the decisions at their original release.
-See [handoff](HANDOFF.md) for evidence and unfinished acceptance gates.
+See [handoff](HANDOFF.md) for evidence and verification status.
 
 ## Repository map
 
@@ -146,7 +146,7 @@ Run `make check` before commits (Ruff, Python/web tests, mypy, TypeScript, build
 Browser unit tests use JSDOM; Canvas warnings there do not establish actual render
 correctness. Verify important display changes with a real browser, and iPad window
 behavior on the physical tablet. Numerical tests cannot replace microphone or
-long-run appliance acceptance. Current 0.4.4 checks: 100 Python + 18 web tests.
+long-run appliance acceptance. Current 0.5.0 checks: 123 Python + 23 web tests.
 
 | Symptom | First check |
 | --- | --- |

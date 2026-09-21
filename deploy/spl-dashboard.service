@@ -9,11 +9,11 @@ Type=simple
 User=spl
 Group=spl
 SupplementaryGroups=audio
-WorkingDirectory=/opt/spl-dashboard/server
+WorkingDirectory=/opt/spl-dashboard
 Environment=SPL_DATA_DIR=/var/lib/spl-dashboard
-Environment=SPL_WEB_DIST=/opt/spl-dashboard/web/dist
 Environment=PYTHONUNBUFFERED=1
-ExecStart=/opt/spl-dashboard/server/.venv/bin/python -m uvicorn spl_dashboard.main:app --host 0.0.0.0 --port 8000 --workers 1
+# The web UI is bundled inside the installed wheel, so SPL_WEB_DIST is not needed.
+ExecStart=/opt/spl-dashboard/.venv/bin/spl-dashboard --host 0.0.0.0 --port 8000 --data-dir /var/lib/spl-dashboard
 Restart=on-failure
 RestartSec=3
 TimeoutStopSec=10

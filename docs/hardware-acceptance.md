@@ -1,9 +1,17 @@
-# Hardware acceptance: first bench session
+# Hardware acceptance and verification status
 
-This is the next gate, not completed evidence. Record the host model, Linux
-version, UMIK serial, calibration file hash/orientation, USB connection, OS input
-gain, reference software version/settings and test date. Do not use provisional
-SPL values to make event-level decisions before this comparison.
+## Verification status
+
+Absolute levels have been compared against REW on the **same microphone** with
+matching results. They have **not** been independently verified against a
+certified sound level meter, and there is no plan to pursue certified
+verification. SPL Dashboard is an operational monitor, not a compliance meter;
+use your own judgement and your own reference for anything that matters.
+
+The procedure below is a **confidence exercise** you can repeat on your own gear,
+not a gating certification. Record the host model, OS version, microphone serial,
+calibration file hash/orientation, USB connection, OS input gain, reference
+software version/settings and test date so results are reproducible.
 
 ## 1. Prove input and isolation
 
@@ -42,7 +50,8 @@ SPL values to make event-level decisions before this comparison.
    document signal and tolerance before comparison. Do not compare it to an
    unweighted or Slow maximum and call the difference an error.
 7. Investigate discrepancies rather than changing tolerances or adding an
-   unexplained trim. Hardware validation remains pending in this release.
+   unexplained trim. Remember this is a comparison against another application
+   (such as REW) on the same microphone, not a certified-meter verification.
 
 ## 3. Verify event durability and failure presentation
 
@@ -71,4 +80,5 @@ SPL values to make event-level decisions before this comparison.
    UI over the event LAN and confirm full operation without external services.
 
 Record results and discrepancies in a dated test artifact, including exported
-records. Complete these checks before treating the appliance as event-ready.
+records. These checks build confidence for your own deployment; they are not a
+certified-meter verification and none is claimed.

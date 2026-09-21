@@ -41,6 +41,8 @@ wheel: ui-bundle
 	@ls -1 $(DIST)/spl_dashboard-*.whl
 
 # Regenerate the documentation screenshots with a headless browser.
+# Playwright is installed on demand (not a committed dependency) to keep CI lean.
 screenshots:
 	cd web && npm run build
-	node scripts/capture-screenshots.mjs
+	cd web && npm install --no-save --include=dev playwright && npx playwright install chromium
+	cd web && node scripts/capture-screenshots.mjs

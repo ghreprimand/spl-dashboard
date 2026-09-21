@@ -1,18 +1,24 @@
 # Build handoff
 
-This document describes the **current** state of the appliance at version 0.4.4
-(public source snapshot). It is self-contained: read it top to bottom for the present
-behaviour. The **Version history** at the end is retained for context only and
-is explicitly superseded where it disagrees with the sections above.
+This document describes the **current** state of SPL Dashboard at version 0.5.0.
+It is self-contained: read it top to bottom for the present behaviour. The
+**Version history** at the end is retained for context only and is explicitly
+superseded where it disagrees with the sections above.
 
-## Current state (0.4.4)
+## Current state (0.5.0)
 
-Hardware-test beta. The appliance runs one shared capture/DSP runtime with:
+Distributed on PyPI as `spl-dashboard` and runnable cross-platform with
+`uvx spl-dashboard`. The web UI is bundled inside the wheel; a `spl-dashboard`
+console command starts the service, prints the local and LAN URLs, and defaults
+its data directory to a per-user platform location. The service runs one shared
+capture/DSP runtime with:
 
 - Explicit USB device selection (serial-bound or physical-port-bound), local PCM WAV replay, and a
   clearly labelled generated demonstration input.
 - Input health (connected / stale / clipping / gap / overrun), calibration-file
-  parsing and correction, and reference-based A/C weighting.
+  parsing and correction, and four calibration modes: automatic UMIK-1 file
+  (Linux direct input), acoustic reference (with a guided raw-RMS capture),
+  manual sensitivity (dBFS at 94 dB SPL), and diagnostics-only.
 - Broadband metrics: `LAS` (A Slow), `LAeq1` (60 s), `LAeq10` (600 s), `LCpeak`
   (C-weighted peak held from event/reset) and **maximum live level** (`lasMaxDb`).
 - A multiresolution FFT spectrum analyzer (see below), not a single fixed trace.
@@ -83,20 +89,26 @@ estimate. Details and validation gates live in
 
 ## Calibration and sources of truth
 
-Supported direct UMIK-1 capture applies the supplied sensitivity file and shows
-FILE CAL; the device/gain gates and conversion are in
-[`umik-sensitivity.md`](umik-sensitivity.md). A manual acoustic reference is
-optional and takes precedence (REFERENCE CAL). `status.calibrated` means a
-supported file conversion or explicit reference is applied — not independent
-physical validation, which remains pending and is surfaced separately as
-`validationPending`. The hardware source remains `umik-unverified` in this release; a field comparison
-alone does not automatically change that enum. Equations, reference sources, numerical conventions and predeclared
-tolerances are in [`dsp-implementation.md`](dsp-implementation.md).
+Supported direct UMIK-1 capture (Linux) applies the supplied sensitivity file and
+shows FILE CAL; the device/gain gates and conversion are in
+[`umik-sensitivity.md`](umik-sensitivity.md). For other microphones and other
+operating systems, an acoustic reference (REFERENCE CAL) or a manual sensitivity
+(MANUAL CAL) supplies the absolute offset; a reference takes precedence over a
+file. The calibration-file parser also reads response-only files (Dayton, REW
+`.cal`, Earthworks-style, UMIK-2) for frequency correction, and never invents a
+sensitivity that is not in the file. `status.calibrated` means a calibration is
+*applied* — not independent verification against a certified sound level meter,
+which is surfaced separately as `validationPending`. The hardware source enum
+remains `umik-unverified` for that reason. Equations, reference sources, numerical
+conventions and predeclared tolerances are in
+[`dsp-implementation.md`](dsp-implementation.md).
 
 ## Known boundaries and limitations
 
-- USB capture has been exercised on the NUC5CPYH and a UMIK-1; absolute acoustic
-  accuracy is not yet independently validated.
+- Absolute levels have been compared against REW on the same microphone with
+  matching results. They have **not** been independently verified against a
+  certified sound level meter, and there is no plan to pursue certified
+  verification. This is an operational monitor, not a compliance meter.
 - FFT band energy is a visualization, not a certified octave filter bank; no IEC,
   Class 1/Class 2 or regulatory claim is made.
 - Demo and WAV are clearly separate input modes. No raw event audio is recorded,
@@ -118,38 +130,43 @@ tolerances are in [`dsp-implementation.md`](dsp-implementation.md).
 ## Test evidence
 
 `make check` runs server tests, web tests, ruff lint, mypy types and the web
-build. Current baseline: **100 server tests and 18 web tests pass**. Server tests
+build. Current baseline: **123 server tests and 23 web tests pass**. Server tests
 exercise reference calculations, weighting/time constants, rolling energy
-windows, peak/maximum hold, calibration parsing (including malformed files and
-gain gates), WAV formats, the shared runtime, event persistence and restart
-recovery, raw/estimated separation, the mapping library (migration, dedup,
-same-name versions, activation, recording guards, protected-profile deletion,
-clear) and the spectrum analyzer's numerical gates. Web tests cover warnings,
-reconnect behaviour, schema validation, saved layout controls and the clear
-button. CI (`.github/workflows/ci.yml`) runs pytest + web test + web build on
-Python 3.12 / Node 22; lint and type checks run locally via `make check`.
+windows, peak/maximum hold, calibration parsing (including malformed files, gain
+gates and broadened vendor formats), manual and reference-capture calibration,
+WAV formats, the shared runtime, event persistence and restart recovery,
+raw/estimated separation, the mapping library, the address/CLI helpers, and the
+spectrum analyzer's numerical gates. Web tests cover warnings, reconnect
+behaviour, schema validation, saved layout controls, the clear button, the
+first-run banner and the calibration badges. CI runs `make check` on Linux across
+Python 3.11/3.12 and the Python tests on macOS/Windows (sounddevice import
+tolerated); the release workflow publishes to PyPI via Trusted Publishing.
 
-## Deployment baseline and next steps
+## Deployment
 
-The appliance is deployed to the NUC as a built **wheel** (not an editable
-checkout); see [`deployment.md`](deployment.md) for the current wheel build,
-offline upgrade, SQLite backup and rollback procedures. The NUC is provisioned
-and its automatic UEFI boot has been verified. 0.4.4 is deployed and its automated
-suite passes, but this is a bench/software baseline, **not** field validation.
+For laptop use, `uvx spl-dashboard` runs the published wheel directly. For a
+dedicated always-on box, install the wheel into a venv and run the supplied
+systemd service; see [`deployment.md`](deployment.md) for online, local-wheel and
+fully offline installs plus SQLite backup and rollback. The web UI is bundled in
+the wheel, so upgrades are a single `pip install --upgrade` with no separate UI
+copy. The automated suite passes; treat this as a software baseline.
 
-Run the remaining checks in [`hardware-acceptance.md`](hardware-acceptance.md):
-independent absolute SPL comparison, band-by-band spectrum comparison, multi-hour
-capture soak, iPad window behaviour and offline cold boot. Do not mark real SPL
-complete merely because plausible numbers appear.
+## Verification status
+
+Absolute levels were compared against REW on the same microphone with matching
+results. They have **not** been independently verified against a certified sound
+level meter, and there is no plan to do so — SPL Dashboard is an operational
+monitor, not a compliance meter. The optional checks in
+[`hardware-acceptance.md`](hardware-acceptance.md) (multi-hour soak, offline cold
+boot, iPad window behaviour) remain useful confidence exercises but are not
+gating.
 
 ## Later product work
 
-After hardware evidence: decide authenticated shared-LAN operation, an
-archive/retention policy, a preferred event report format, and a bulk
-mapping-library export/import. Refine iPad placement only after measuring the
-actual attainable window constraints. An operator reported the strip remained visible
-behind a resized Mixing Station for several minutes; a formal iPad workflow test
-is still outstanding, and picture-in-picture was never shipped.
+Possible future work: authenticated shared-LAN operation, an archive/retention
+policy, a preferred event report format, and a bulk mapping-library
+export/import. Picture-in-picture was never shipped; iPad placement uses iPadOS's
+own window controls.
 
 ---
 
@@ -167,7 +184,7 @@ with the current sections, the current sections win.
   obsolete; the analyzer now uses multiresolution windows and publishes three
   band sets.
 - **Analyzer cadence 0.4.1 (superseded, folded into 10 Hz above):** the 20 Hz
-  capture trial was rejected after intermittent NUC overruns; the shipped path
+  capture trial was rejected after intermittent overruns on the target appliance; the shipped path
   computes and sends 10 Hz spectra (the previous WebSocket had been capped at
   5 Hz despite 10 Hz DSP). Multiresolution windows, vectorized band reductions,
   equivalent FFT calibration filtering and read-only history workers reduced load;

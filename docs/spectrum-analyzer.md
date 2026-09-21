@@ -8,7 +8,7 @@ spectrum estimate. No raw audio reaches the browser.
 
 Analysis uses 48 kHz PCM in 100 ms capture blocks (10 updates/s). Broadband
 meter time constants and Leq integration are unchanged. A 20 Hz trial was
-rejected after capture overruns on the NUC. Spectrum windows are 0.1, 0.25, 0.5, 1 and 2 seconds. Each band
+rejected after capture overruns on the target appliance. Spectrum windows are 0.1, 0.25, 0.5, 1 and 2 seconds. Each band
 selects adjacent durations around six FFT bins per band width, blending their
 **powers** by logarithmic duration. This smooth transition avoids a step in
 window behavior between neighboring bands. Broad/balanced views cap at one
@@ -79,7 +79,7 @@ recurrence. Validate pink/white-noise trends separately from tone amplitudes.
 
 Physical REW band-by-band comparison remains pending. The earlier broadband
 A/Slow comparison does not validate the spectrum. Do not invent a fixed bass
-offset from a single tone's leakage error. Benchmark the NUC with recording and
+offset from a single tone's leakage error. Benchmark the target appliance with recording and
 history polling active; retain raw logs and mark deployment gaps.
 
 

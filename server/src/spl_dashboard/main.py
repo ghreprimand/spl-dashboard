@@ -364,14 +364,17 @@ def create_app(directory: Path | None = None) -> FastAPI:
 def locate_web_dist() -> Path | None:
     """Resolve the built web UI.
 
-    Order: the UI bundled inside the installed package, then the SPL_WEB_DIST
-    developer override, then a source-checkout ``web/dist``. Returns ``None`` when
-    no built UI is available so the caller can serve a clear error instead.
+    Normal installs serve the UI bundled inside the package. The SPL_WEB_DIST
+    developer override, when set, takes precedence so a developer can serve a
+    live build without reinstalling; a source-checkout ``web/dist`` is the final
+    fallback. Returns ``None`` when no built UI is available so the caller can
+    serve a clear error instead.
     """
-    candidates = [Path(__file__).resolve().parent / "static"]
+    candidates: list[Path] = []
     override = os.environ.get("SPL_WEB_DIST")
     if override:
         candidates.append(Path(override))
+    candidates.append(Path(__file__).resolve().parent / "static")
     candidates.append(Path(__file__).resolve().parents[3] / "web/dist")
     for candidate in candidates:
         if (candidate / "index.html").is_file() and (candidate / "assets").is_dir():
