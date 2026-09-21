@@ -1,0 +1,35 @@
+.DS_Store
+.env
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+*.egg-info/
+node_modules/
+web/dist/
+*.tsbuildinfo
+coverage/
+*.sqlite3
+logs/
+
+# Local serial-specific microphone files
+/UMIKCal/
+
+# Private runtime data, credentials and local agent artifacts
+.archon/
+.env.*
+!.env.example
+*.sqlite3-*
+*.db
+*.db-*
+*.pem
+*.key
+*.p12
+*.pfx
+*.wav
+*.flac
+*.mp3
+.mypy_cache/
+server/dist/
+server/build/

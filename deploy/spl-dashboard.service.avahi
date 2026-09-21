@@ -1,0 +1,3 @@
+<?xml version="1.0" standalone="no"?>
+<!DOCTYPE service-group SYSTEM "avahi-service.dtd">
+<service-group><name replace-wildcards="yes">SPL Dashboard on %h</name><service><type>_http._tcp</type><port>8000</port><txt-record>path=/display</txt-record></service></service-group>

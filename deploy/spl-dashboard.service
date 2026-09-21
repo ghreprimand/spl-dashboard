@@ -1,0 +1,30 @@
+[Unit]
+Description=LAN SPL monitoring appliance
+After=network.target sound.target
+StartLimitIntervalSec=60
+StartLimitBurst=5
+
+[Service]
+Type=simple
+User=spl
+Group=spl
+SupplementaryGroups=audio
+WorkingDirectory=/opt/spl-dashboard/server
+Environment=SPL_DATA_DIR=/var/lib/spl-dashboard
+Environment=SPL_WEB_DIST=/opt/spl-dashboard/web/dist
+Environment=PYTHONUNBUFFERED=1
+ExecStart=/opt/spl-dashboard/server/.venv/bin/python -m uvicorn spl_dashboard.main:app --host 0.0.0.0 --port 8000 --workers 1
+Restart=on-failure
+RestartSec=3
+TimeoutStopSec=10
+StateDirectory=spl-dashboard
+StateDirectoryMode=0750
+UMask=0027
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+PrivateTmp=true
+# Audio devices must remain available; do not enable PrivateDevices.
+
+[Install]
+WantedBy=multi-user.target
