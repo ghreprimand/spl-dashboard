@@ -48,7 +48,7 @@ the operating system's own input-gain stage is known. On Linux the app can
 verify there isn't one. On macOS and Windows it doesn't yet read the OS input
 slider, so it refuses to guess. Reading that slider is planned; until then,
 Mac/Windows users need a calibrator or a known sensitivity (see the
-[calibration guide](docs/calibration-guide.md)).
+[calibration guide](docs/calibration-guide.md)). See the [roadmap](ROADMAP.md).
 
 **Recommended setup:** a small always-on Linux box with the mic plugged in
 (an old laptop, a mini PC, or a Raspberry Pi 4/5 on 64-bit Raspberry Pi OS)
@@ -115,6 +115,7 @@ uvx spl-dashboard@latest        # run the newest release
 ## Documentation
 
 - **[Documentation index](docs/README.md)** — everything, organised by audience.
+- [Roadmap](ROADMAP.md) — what's planned and what isn't.
 - [Getting started](docs/getting-started.md) · [Calibration guide](docs/calibration-guide.md) · [Tablet setup](docs/tablet-setup.md) · [Troubleshooting](docs/troubleshooting.md)
 
 ## Important: what this is, and is not
