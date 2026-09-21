@@ -1,0 +1,4 @@
+"Dayton Audio EMM-6 (SYNTHETIC TEST FIXTURE)"
+31.5   0.40
+1000   0.00
+16000  0.70

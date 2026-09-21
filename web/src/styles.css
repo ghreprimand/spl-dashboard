@@ -734,3 +734,10 @@ footer {
   opacity: 0.8;
   margin-top: 8px;
 }
+
+.manual-cal {
+  margin: 8px 0;
+  padding: 10px 12px;
+  border: 1px solid var(--line, #263735);
+  border-radius: 6px;
+}

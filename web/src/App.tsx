@@ -73,10 +73,13 @@ export function statusMessages(
   if (!frame.status.calibrated && frame.source !== "demo")
     messages.push("UNCALIBRATED");
   if (frame.status.calibrated) {
+    const method = frame.diagnostics.calibrationMethod;
     messages.push(
-      frame.diagnostics.calibrationMethod === "umik-file"
+      method === "umik-file"
         ? "FILE CAL"
-        : "REFERENCE CAL",
+        : method === "manual"
+          ? "MANUAL CAL"
+          : "REFERENCE CAL",
     );
   } else if (frame.status.validationPending && frame.source !== "demo") {
     messages.push("UNVERIFIED");
@@ -259,6 +262,26 @@ function Setup({
 }) {
   const [draft, setDraft] = useState(settings);
   const [fileError, setFileError] = useState("");
+  const [capturing, setCapturing] = useState(false);
+  const [captureNote, setCaptureNote] = useState("");
+  const captureReference = async () => {
+    setCapturing(true);
+    setCaptureNote("");
+    try {
+      const result = await api<{ rmsDbfs: number; seconds: number }>(
+        "/reference/capture",
+        "POST",
+      );
+      setDraft((current) => ({ ...current, referenceRmsDbfs: result.rmsDbfs }));
+      setCaptureNote(
+        `Captured ${result.rmsDbfs.toFixed(1)} dBFS over ${result.seconds}s. Enter the known SPL and a note, then apply.`,
+      );
+    } catch (e) {
+      setCaptureNote(e instanceof Error ? e.message : String(e));
+    } finally {
+      setCapturing(false);
+    }
+  };
   const fileSerial =
     draft.calibrationText.match(/SERNO\s*:\s*([\w-]+)/i)?.[1] ?? "";
   const selectedDevice = devices.find((d) => d.id === draft.device);
@@ -425,15 +448,46 @@ function Setup({
                   referenceDb: null,
                   referenceRmsDbfs: null,
                   referenceNote: "",
+                  manualDbfsAt94: null,
                 })
               }
             >
               <option value="auto">Automatic UMIK-1 calibration file</option>
               <option value="reference">Known-level acoustic reference</option>
+              <option value="manual">Manual sensitivity · dBFS at 94 dB SPL</option>
               <option value="off">Input diagnostics only</option>
             </select>
           </label>
         </div>
+        {draft.calibrationMode === "manual" && (
+          <div className="manual-cal">
+            <p className="muted">
+              Enter the raw RMS the microphone produces at 94 dB SPL, in this
+              app’s dBFS scale (equivalent to a miniDSP “Sens Factor”). Get it
+              from the microphone’s data or by measuring a calibrator with the
+              value shown under Input health.
+            </p>
+            <div className="form-grid">
+              {field("manualDbfsAt94", "Sensitivity · dBFS at 94 dB SPL")}
+              <label>
+                Interface & OS input gain note (required)
+                <input
+                  value={draft.referenceNote}
+                  onChange={(e) =>
+                    setDraft({ ...draft, referenceNote: e.target.value })
+                  }
+                  placeholder="e.g. Focusrite Solo, macOS input 75%, no boost"
+                />
+              </label>
+            </div>
+            <p className="notice">
+              The operating system’s input-volume slider (macOS Sound input,
+              Windows microphone level) changes the digital level and makes this
+              value wrong. Set the input level, note it here, and do not change
+              it afterwards.
+            </p>
+          </div>
+        )}
         {draft.mode === "device" &&
           fileSerial &&
           !selectedDevice?.serialBound && (
@@ -479,6 +533,24 @@ function Setup({
               />
             </label>
           </div>
+          <div className="actions">
+            <button
+              type="button"
+              onClick={() => void captureReference()}
+              disabled={capturing || draft.mode === "demo"}
+            >
+              {capturing ? "Capturing…" : "Capture raw RMS now"}
+            </button>
+            <span className="muted">
+              Play a steady reference (a calibrator on the mic, or a known-SPL
+              tone) and capture ~5&nbsp;s to fill Observed raw RMS.
+            </span>
+          </div>
+          {captureNote && (
+            <p className="notice" role="status">
+              {captureNote}
+            </p>
+          )}
         </details>
         <details>
           <summary>Event thresholds & audience estimate</summary>

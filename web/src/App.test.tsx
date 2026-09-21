@@ -174,6 +174,21 @@ describe("measurement presentation", () => {
     );
     expect(statusMessages(frame, "live")).not.toContain("DEMO");
   });
+  it("labels file, reference and manual calibration distinctly", () => {
+    const calibrated = { ...frame, status: { ...frame.status, calibrated: true } };
+    const badge = (method: string) =>
+      statusMessages(
+        {
+          ...calibrated,
+          diagnostics: { ...frame.diagnostics, calibrationMethod: method as never },
+        },
+        "live",
+      );
+    expect(badge("umik-file")).toContain("FILE CAL");
+    expect(badge("reference")).toContain("REFERENCE CAL");
+    expect(badge("manual")).toContain("MANUAL CAL");
+    expect(badge("manual")).not.toContain("REFERENCE CAL");
+  });
 });
 
 describe("per-browser layout", () => {

@@ -3,6 +3,7 @@ import contextlib
 import json
 import logging
 import time
+from collections import deque
 from pathlib import Path
 from typing import Literal
 
@@ -34,6 +35,8 @@ class Runtime:
         self.last_sequence = 0
         self.clip_until = 0.0
         self.gap_active = False
+        # Recent raw block energies (monotonic time, mean square) for reference capture.
+        self.raw_energy: deque[tuple[float, float]] = deque(maxlen=200)
         self.config_lock = asyncio.Lock()
         self.build_processor()
 
@@ -42,11 +45,20 @@ class Runtime:
         self.update_reading_location()
         calibration = parse_calibration(settings.calibrationText)
         offset = None
-        method: Literal["none", "demo", "umik-file", "reference"] = "none"
+        method: Literal["none", "demo", "umik-file", "reference", "manual"] = "none"
         reason = "Absolute calibration disabled"
         if settings.mode == "demo":
             offset, method, reason = 128.0, "demo", "DEMO — generated signal"
-        elif settings.calibrationMode != "off":
+        elif settings.calibrationMode == "manual" and settings.manualDbfsAt94 is not None:
+            offset = 94.0 - settings.manualDbfsAt94
+            method, reason = "manual", "Calibrated to the entered 94 dB SPL sensitivity"
+            offset += settings.fieldTrimDb
+            if calibration:
+                _, response = signal.freqz(
+                    calibration.fir(SAMPLE_RATE), worN=[1000], fs=SAMPLE_RATE
+                )
+                offset -= float(20 * np.log10(abs(response[0])))
+        elif settings.calibrationMode not in ("off", "manual"):
             if settings.referenceDb is not None and settings.referenceRmsDbfs is not None:
                 offset = settings.referenceDb - settings.referenceRmsDbfs
                 method, reason = "reference", "Calibrated to the recorded acoustic reference"
@@ -81,7 +93,7 @@ class Runtime:
         self.frame.source = {"demo": "demo", "device": "umik-unverified", "wav": "wav-unverified"}[
             settings.mode
         ]  # type: ignore[assignment]
-        self.frame.status.calibrated = method in ("umik-file", "reference")
+        self.frame.status.calibrated = method in ("umik-file", "reference", "manual")
         self.frame.status.warmupSeconds = 600 if offset is not None else 0
         self.frame.diagnostics = Diagnostics(
             device=settings.device if settings.mode == "device" else settings.mode,
@@ -303,9 +315,11 @@ class Runtime:
                         else 0
                     )
                     diag = self.frame.diagnostics
-                    diag.rmsDbfs = db(float(np.mean(block.samples**2)))
+                    mean_square = float(np.mean(block.samples**2))
+                    diag.rmsDbfs = db(mean_square)
                     diag.peakDbfs = db(peak**2)
                     diag.framesProcessed += CAPTURE_BLOCK
+                    self.raw_energy.append((block.captured, mean_square))
                     previous_alarms = self.frame.alarms
                     self.frame.alarms = []
                     if measured:
@@ -431,3 +445,39 @@ class Runtime:
             "offsetDb": processor.offset,
             "device": self.settings.device,
         }
+
+    async def capture_reference_rms(self, seconds: float = 5.0) -> dict:
+        """Average raw RMS dBFS over a few seconds to fill the reference field.
+
+        This measures the level of a steady reference source (an acoustic
+        calibrator or a stable tone at a known SPL) in the app's own dBFS scale,
+        so the operator does not have to read it from another application.
+        """
+        if self.store.current():
+            raise ValueError("Stop event recording before capturing a reference")
+        if self.settings.mode == "demo":
+            raise ValueError("Reference capture needs a real input, not the demonstration signal")
+        if not self.frame.status.connected or self.frame.status.stale:
+            raise ValueError("A connected, live input is required")
+        needed = max(1, round(seconds * 10))
+        start = time.monotonic()
+        clips = self.frame.status.clipSeconds
+        gaps = self.frame.status.gapCount
+        deadline = start + seconds + 10
+        while time.monotonic() - start < seconds:
+            if not self.frame.status.connected or self.frame.status.stale:
+                raise ValueError("Input stopped during capture; repeat it")
+            if self.frame.status.clipSeconds != clips:
+                raise ValueError("Input clipped during capture; reduce the level and repeat it")
+            if self.frame.status.gapCount != gaps:
+                raise ValueError("Input gap during capture; repeat it")
+            if time.monotonic() > deadline:
+                raise ValueError("Capture timed out; repeat it")
+            await asyncio.sleep(0.05)
+        recent = list(self.raw_energy)[-needed:]
+        if len(recent) < needed:
+            raise ValueError("Not enough audio captured; repeat it")
+        rms = db(float(np.mean([mean_square for _, mean_square in recent])))
+        if rms is None:
+            raise ValueError("Signal too quiet to measure; check the input and level")
+        return {"rmsDbfs": round(rms, 2), "seconds": round(len(recent) / 10, 1)}

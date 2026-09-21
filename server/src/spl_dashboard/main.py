@@ -193,6 +193,10 @@ def create_app(directory: Path | None = None) -> FastAPI:
     async def capture_mapping():
         return await runtime().capture_mapping_level()
 
+    @app.post("/api/reference/capture")
+    async def capture_reference():
+        return await runtime().capture_reference_rms()
+
     @app.post("/api/events/current/reset-maximum")
     async def reset_maximum():
         runtime().reset_maximum()

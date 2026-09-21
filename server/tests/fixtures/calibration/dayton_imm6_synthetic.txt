@@ -1,0 +1,4 @@
+* Dayton Audio iMM-6 (SYNTHETIC TEST FIXTURE)
+20 0.9
+1000 0.0
+20000 -1.7

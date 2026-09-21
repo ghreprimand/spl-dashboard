@@ -64,7 +64,7 @@ export interface TelemetryFrame {
     framesProcessed: number;
     inputAgeSeconds: number | null;
     referenceOffsetDb: number | null;
-    calibrationMethod?: "none" | "demo" | "umik-file" | "reference";
+    calibrationMethod?: "none" | "demo" | "umik-file" | "reference" | "manual";
     calibrationReason?: string;
     calibrationModel?: string | null;
     analogGainDb?: number | null;
@@ -86,11 +86,12 @@ export interface Settings {
   sampleRate: 48000;
   wavPath: string;
   calibrationText: string;
-  calibrationMode: "auto" | "reference" | "off";
+  calibrationMode: "auto" | "reference" | "off" | "manual";
   confirmedMicSerial: string;
   referenceDb: number | null;
   referenceRmsDbfs: number | null;
   referenceNote: string;
+  manualDbfsAt94?: number | null;
   fieldTrimDb: number;
   lasThreshold: number | null;
   leqThreshold: number | null;

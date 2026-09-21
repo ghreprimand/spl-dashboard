@@ -1,0 +1,7 @@
+* Dayton Audio UMM-6 frequency response (SYNTHETIC TEST FIXTURE)
+* Serial 12345  Calibrated for 0 degree incidence
+20.00	1.20
+50.00	0.60
+1000.00	0.00
+10000.00	0.85
+20000.00	-2.10

@@ -14,11 +14,12 @@ class Settings(Model):
     sampleRate: Literal[48000] = 48000
     wavPath: str = ""
     calibrationText: str = Field(default="", max_length=200000)
-    calibrationMode: Literal["auto", "reference", "off"] = "auto"
+    calibrationMode: Literal["auto", "reference", "off", "manual"] = "auto"
     confirmedMicSerial: str = Field(default="", max_length=40)
     referenceDb: float | None = Field(default=None, ge=40, le=140)
     referenceRmsDbfs: float | None = Field(default=None, ge=-120, le=0)
     referenceNote: str = Field(default="", max_length=500)
+    manualDbfsAt94: float | None = Field(default=None, ge=-120, le=0)
     fieldTrimDb: float = Field(default=0, ge=-20, le=20)
     lasThreshold: float | None = Field(default=None, ge=40, le=140)
     leqThreshold: float | None = Field(default=None, ge=40, le=140)
@@ -36,6 +37,11 @@ class Settings(Model):
             self.calibrationMode = "reference"  # Preserve existing explicit-reference settings.
         if self.referenceDb is not None and not self.referenceNote.strip():
             raise ValueError("Record reference equipment and input gain in the reference note")
+        if self.calibrationMode == "manual":
+            if self.manualDbfsAt94 is None:
+                raise ValueError("Enter the raw RMS dBFS this microphone produces at 94 dB SPL")
+            if not self.referenceNote.strip():
+                raise ValueError("Record the input interface and OS input gain in the note")
         if self.audienceOffsetDb is not None and not self.venueName.strip():
             raise ValueError("Audience correction requires a named venue profile")
         if self.mode == "device" and not self.device:
@@ -78,7 +84,7 @@ class Diagnostics(Model):
     framesProcessed: int = 0
     inputAgeSeconds: float | None = None
     referenceOffsetDb: float | None = None
-    calibrationMethod: Literal["none", "demo", "umik-file", "reference"] = "none"
+    calibrationMethod: Literal["none", "demo", "umik-file", "reference", "manual"] = "none"
     calibrationReason: str = "No absolute calibration"
     calibrationModel: str | None = None
     analogGainDb: float | None = None

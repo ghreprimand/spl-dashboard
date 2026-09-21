@@ -1,0 +1,4 @@
+Earthworks M23 microphone response (SYNTHETIC TEST FIXTURE)
+20 0.10
+1000 0.00
+23000 0.25
