@@ -29,7 +29,8 @@ and PyPI versions are immutable, so bump the version rather than re-tagging.
 1. **Bump the version** in `server/pyproject.toml` (`version = "X.Y.Z"`) and in
    `create_app`'s `FastAPI(..., version=...)` in `server/src/spl_dashboard/main.py`.
    Add a matching entry to [`CHANGELOG.md`](../CHANGELOG.md).
-2. **Verify locally:** `make check`, then `make wheel` and a smoke test:
+2. **Verify locally:** `make server-install` (refreshes the editable install's
+   version metadata, which `--version` reads), then `make check`, then `make wheel` and a smoke test:
    `uvx --from dist/spl_dashboard-X.Y.Z-py3-none-any.whl spl-dashboard`.
 3. **Commit** the version bump and changelog.
 4. **Tag and push:**

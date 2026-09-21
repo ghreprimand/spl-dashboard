@@ -74,9 +74,14 @@ def test_cli_main_sets_data_dir_env_and_starts_server(tmp_path, monkeypatch, cap
 
 
 def test_cli_version(capsys):
+    """--version prints the version declared in pyproject.toml (the release source of truth)."""
+    import tomllib
+
+    pyproject = Path(__file__).resolve().parents[1] / "pyproject.toml"
+    expected = tomllib.loads(pyproject.read_text())["project"]["version"]
     cli.main(["--version"])
     out = capsys.readouterr().out.strip()
-    assert out == "0.5.0"
+    assert out == expected
 
 
 def test_missing_ui_reports_clear_error(tmp_path, monkeypatch):
