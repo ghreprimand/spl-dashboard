@@ -1,12 +1,13 @@
 import asyncio
 import csv
-import fcntl
 import io
 import json
 import os
+import sys
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
 from pathlib import Path
+from typing import IO
 from urllib.parse import urlsplit
 
 from fastapi import FastAPI, HTTPException, Request, WebSocket, WebSocketDisconnect
@@ -28,6 +29,21 @@ def _default_data_dir() -> Path:
     return Path(user_data_dir("spl-dashboard", appauthor=False))
 
 
+def _lock_exclusive(handle: IO[str]) -> None:
+    """Non-blocking exclusive lock on the data directory (POSIX flock or Windows locking).
+
+    Raises OSError when another process already holds the lock.
+    """
+    if sys.platform == "win32":
+        import msvcrt
+
+        msvcrt.locking(handle.fileno(), msvcrt.LK_NBLCK, 1)
+    else:
+        import fcntl
+
+        fcntl.flock(handle, fcntl.LOCK_EX | fcntl.LOCK_NB)
+
+
 def create_app(directory: Path | None = None) -> FastAPI:
     data_dir = directory or _default_data_dir()
 
@@ -36,8 +52,8 @@ def create_app(directory: Path | None = None) -> FastAPI:
         data_dir.mkdir(parents=True, exist_ok=True)
         with (data_dir / "service.lock").open("w") as lock:
             try:
-                fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
-            except BlockingIOError as exc:
+                _lock_exclusive(lock)
+            except OSError as exc:
                 raise RuntimeError(
                     "One service worker only: this data directory is in use"
                 ) from exc
