@@ -19,12 +19,10 @@ each site (create the project as a "pending publisher" if it does not exist yet)
 | Workflow name | `release.yml` |
 | Environment name | `pypi` |
 
-**On [TestPyPI](https://test.pypi.org/manage/account/publishing/):** the same,
-but with environment name `testpypi`.
-
-Also create the two GitHub Actions **environments** in the repository settings
-(`Settings → Environments`): `pypi` and `testpypi`. You may add required
-reviewers to the `pypi` environment to gate the final publish.
+Also create the GitHub Actions **environment** `pypi` in the repository settings
+(`Settings → Environments`). You may add required reviewers to it to gate the
+publish. TestPyPI is deliberately not used: `twine check` runs in the build job,
+and PyPI versions are immutable, so bump the version rather than re-tagging.
 
 ## Cutting a release
 
@@ -43,32 +41,18 @@ reviewers to the `pypi` environment to gate the final publish.
 
 ## What the workflow does
 
-On any `v*` tag, `.github/workflows/release.yml` runs three jobs:
+On any `v*` tag, `.github/workflows/release.yml` runs two jobs:
 
 1. **build** — builds the web UI, bundles it into the package (`make ui-bundle`),
    builds the sdist and wheel (`python -m build`), runs `twine check`, and uploads
    both as workflow artifacts named `distributions`.
-2. **testpypi** — downloads the artifacts and publishes them to **TestPyPI** via
-   Trusted Publishing (environment `testpypi`). `skip-existing` lets a re-run pass
-   if that version is already there.
-3. **pypi** — after TestPyPI succeeds, publishes the same artifacts to **PyPI**
-   via Trusted Publishing (environment `pypi`).
-
-For the very first publish, watch the TestPyPI job succeed before approving/allowing
-the PyPI job, and confirm the TestPyPI page renders the README correctly.
+2. **pypi** — downloads the artifacts and publishes them to **PyPI** via
+   Trusted Publishing (environment `pypi`, OIDC, no stored token).
 
 ## Verify a published release
 
 ```bash
 uvx spl-dashboard@X.Y.Z          # runs the exact version from PyPI
-```
-
-From TestPyPI (before the PyPI publish, for the first run):
-
-```bash
-uvx --index-url https://test.pypi.org/simple/ \
-    --extra-index-url https://pypi.org/simple/ \
-    spl-dashboard@X.Y.Z
 ```
 
 Open `http://localhost:8000/` and `http://localhost:8000/display` and confirm the

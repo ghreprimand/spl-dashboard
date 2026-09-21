@@ -31,27 +31,9 @@ jobs:
           name: distributions
           path: dist/*
 
-  testpypi:
-    name: Publish to TestPyPI
-    needs: build
-    runs-on: ubuntu-latest
-    environment: testpypi
-    permissions:
-      id-token: write
-    steps:
-      - uses: actions/download-artifact@v4
-        with:
-          name: distributions
-          path: dist
-      - name: Publish to TestPyPI (Trusted Publishing)
-        uses: pypa/gh-action-pypi-publish@release/v1
-        with:
-          repository-url: https://test.pypi.org/legacy/
-          skip-existing: true
-
   pypi:
     name: Publish to PyPI
-    needs: [build, testpypi]
+    needs: build
     runs-on: ubuntu-latest
     environment: pypi
     permissions:
