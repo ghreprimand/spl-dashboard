@@ -41,13 +41,17 @@ and PyPI versions are immutable, so bump the version rather than re-tagging.
 
 ## What the workflow does
 
-On any `v*` tag, `.github/workflows/release.yml` runs two jobs:
+On any `v*` tag, `.github/workflows/release.yml` runs three jobs:
 
 1. **build** — builds the web UI, bundles it into the package (`make ui-bundle`),
    builds the sdist and wheel (`python -m build`), runs `twine check`, and uploads
    both as workflow artifacts named `distributions`.
 2. **pypi** — downloads the artifacts and publishes them to **PyPI** via
    Trusted Publishing (environment `pypi`, OIDC, no stored token).
+3. **github-release** — creates the GitHub Release for the tag, with the
+   matching `CHANGELOG.md` section as notes and the wheel/sdist attached. Keep
+   the changelog heading in the form `## 0.5.0 ...` or `## [0.5.0] ...` so it
+   is found.
 
 ## Verify a published release
 

@@ -45,3 +45,41 @@ jobs:
           path: dist
       - name: Publish to PyPI (Trusted Publishing)
         uses: pypa/gh-action-pypi-publish@release/v1
+
+  github-release:
+    name: Create GitHub Release
+    needs: pypi
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: distributions
+          path: dist
+      - name: Extract this version's CHANGELOG entry
+        run: |
+          version="${GITHUB_REF_NAME#v}"
+          awk -v v="$version" '
+            $0 ~ "^## \\[?" v "([^0-9.]|$)" {found=1; next}
+            /^## / {if (found) exit}
+            found {print}
+          ' CHANGELOG.md > notes.md
+          if [ ! -s notes.md ]; then
+            echo "No CHANGELOG entry for $version; see CHANGELOG.md." > notes.md
+          fi
+          {
+            echo "Install or upgrade: \`uvx spl-dashboard@$version\` — see the [README](https://github.com/${GITHUB_REPOSITORY}#install-and-run). Published on [PyPI](https://pypi.org/project/spl-dashboard/$version/)."
+            echo
+            cat notes.md
+          } > body.md
+      - name: Create release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "$GITHUB_REF_NAME" \
+            --title "SPL Dashboard ${GITHUB_REF_NAME#v}" \
+            --notes-file body.md \
+            --verify-tag \
+            dist/*
