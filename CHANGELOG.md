@@ -3,6 +3,15 @@
 All notable changes to SPL Dashboard are recorded here. This project adheres to
 [Semantic Versioning](https://semver.org/).
 
+## Unreleased
+
+### Documentation
+
+- Added microphone headroom guidance: the UMIK-1's factory 18 dB gain setting
+  clips around the low 120s dB SPL, the 0 dB setting raises the limit to the
+  capsule's 133 dB rating, what the clip indicator can and cannot see, and
+  higher-headroom XLR alternatives. README, calibration guide, troubleshooting.
+
 ## 0.5.1
 
 ### Fixed

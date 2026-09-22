@@ -107,6 +107,76 @@ Use **Input diagnostics only**. You still get the spectrum analyzer (in dBFS),
 clipping and input-health warnings, and can watch relative level changes — just
 not absolute dB SPL.
 
+## Headroom and clipping
+
+Calibration tells the app what a signal level means in dB SPL; it cannot help
+once the signal is clipped. A clipped waveform has its peaks flattened, so the
+peak reading pins at the ceiling and the averages drift — usually low, because
+energy is lost, sometimes high, because clipping adds harmonics that A-weighting
+passes. Once the input is clipping regularly, nothing the app reports is
+trustworthy, A-weighted averages included.
+
+**How loud is loud?** Instantaneous peaks (LCpeak) in live music run roughly
+30–35 dB above the A-weighted slow level. A show at 99 dB LAS has peaks in the
+mid 130s. A microphone rated 140 dB SPL is the usual recommendation for
+concert-level measurement; the numbers below show how close a given setup gets.
+
+### UMIK-1: two ceilings
+
+| Gain switch | ADC full scale (hard clip) | Capsule 1 % THD (soft) | Limit |
+| --- | --- | --- | --- |
+| 18 dB (factory) | ≈ 124 dB SPL | 133 dB SPL | ADC |
+| 0 dB | ≈ 142 dB SPL | 133 dB SPL | capsule |
+
+The capsule figure is miniDSP's specification (133 dB SPL at 1 % THD, 0 dB gain
+setting). The ADC figures follow from the calibration convention below and have
+not been measured on hardware by the project; treat them as approximate.
+
+At the factory 18 dB setting the ADC clips about 9 dB before the capsule is in
+trouble, so peaks on any loud show clip and the readings go wrong. Opening the
+microphone and setting the internal gain switch to 0 dB moves the hard ceiling
+above the capsule's, leaving 133 dB at 1 % THD as the working limit. That is a
+distortion threshold rather than a wall — peaks a few dB past it read slightly
+soft rather than collapsing.
+
+After flipping the switch:
+
+- **Automatic mode (Linux):** nothing to do. The UMIK-1 reports the switch
+  position in its USB name (`Umik-1 Gain: 0dB`), and the app shifts the
+  cal-file level by the difference from the file's 18 dB reference.
+- **Reference or manual mode:** the raw dBFS at any given SPL is now 18 dB lower.
+  Recapture the reference, or subtract 18 dB from a typed-in sensitivity.
+
+### What the clip indicator sees
+
+The `CLIP` indicator and the `clipSeconds` counter in the status watch the raw
+samples for full scale. They catch ADC overload reliably. They cannot see
+capsule distortion, which happens before the ADC — so at 0 dB gain, LCpeak
+readings above roughly 133 dB are approximate even with no clip warning.
+
+A few clip-seconds over a night barely affect a 1- or 10-minute LAeq. A
+steadily climbing count means the averages are no longer meaningful.
+
+**Find your real ceiling in one shot:** raise the level until the clip
+indicator lights and note what LCpeak reads while it is pinned. That reading is
+the ADC full scale in dB SPL for the current gain setting.
+
+### Other microphones and interfaces
+
+The app reads any input device, so a higher-headroom XLR measurement microphone
+into an audio interface is a straightforward upgrade. Low-sensitivity mics
+rated 140 dB SPL — the iSEMcon EMX-7150 (≈ 6 mV/Pa) and Audix TM1 are the common
+choices — are what touring engineers use for SPL work. Cheaper options such as
+the Superlux ECM999 (132 dB at 1 % THD, no individual cal file) or Line Audio
+Omni1 (133 dB, factory-trimmed to ±1 dB) land in the same headroom class as a
+UMIK-1 at 0 dB gain, but with soft limits rather than a hard one.
+
+The interface is the other half of the chain. At 140 dB SPL a 6 mV/Pa mic puts
+out about 1.2 V (+4 dBu), which a Focusrite Scarlett-class input (+9.5 dBu max)
+handles at minimum gain; a 30 mV/Pa mic puts out +18 dBu and will clip most
+interface preamps. Avoid interfaces whose input level control is software-only;
+they clip at the same level regardless of the knob.
+
 ## Full-scale convention
 
 This app uses `RMS dBFS = 20·log10(rms)`, so a full-scale sine reads −3.01 dBFS.

@@ -76,6 +76,10 @@ The app runs at 48 kHz. If your microphone or interface is set to another rate:
 - On macOS/Windows, the OS input-volume slider changes the digital level and
   invalidates a manual or reference calibration. Set it, note it, and don't
   change it afterwards; recalibrate if you do.
+- Readings that go *down* as the show gets louder, or a `Peak since reset` that
+  stops rising, mean the input is clipping. Check the `CLIP` indicator and the
+  clip-seconds count; a UMIK-1 at its factory 18 dB gain setting clips in the
+  low 120s dB SPL. See [headroom and clipping](calibration-guide.md#headroom-and-clipping).
 - `Peak since reset` is a **C-weighted** held peak — it is legitimately higher
   than the A-weighted live level and averages. Use its reset arrow to clear it.
 

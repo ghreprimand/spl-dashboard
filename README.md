@@ -55,6 +55,22 @@ Mac/Windows users need a calibrator or a known sensitivity (see the
 sitting at the mic position, and the iPad as the display. It should run fine
 on a Pi 4 or 5 — that has not been tested by the project yet; reports welcome.
 
+### Microphone headroom
+
+Any measurement microphone works, but check its ceiling against your shows.
+Instantaneous peaks in live music run roughly 30–35 dB above the A-weighted
+slow level, so a show sitting at 100 dB LAS has peaks in the low-to-mid 130s.
+
+- **UMIK-1:** it ships with the internal gain switch at **18 dB**, which puts
+  the ADC's full scale around the low 120s dB SPL — peaks clip on any loud show
+  and every reading goes wrong. Open the mic and set the switch to **0 dB**;
+  the limit is then the capsule itself, rated 133 dB SPL at 1 % THD. On Linux
+  the app reads the switch position from the USB name and adjusts the cal-file
+  level automatically; on macOS/Windows redo your calibration after flipping it.
+- **Louder than that:** use a low-sensitivity XLR measurement mic rated 140 dB
+  (iSEMcon EMX-7150, Audix TM1) into an audio interface; the app reads any
+  input device. See [headroom and clipping](docs/calibration-guide.md#headroom-and-clipping).
+
 ## Install and run
 
 First install [uv](https://docs.astral.sh/uv/) (a single small tool), then run the
